@@ -9,6 +9,7 @@ from ui import Mediator, DriveShareMediator, LoginFrame, RegisterFrame, Dashboar
 
 
 def SetDummyData():
+#List of Ddummy Cities
     dummyCities = {
         "Dearborn", "Rochester Hills", "Bloomfield Hills", "Birmingham", "Troy", "Ann Arbor"
     }
@@ -16,17 +17,18 @@ def SetDummyData():
     dummyRenterAccount = User("Renter", "password", "Renter@gmail.com", "Red", "Buddy", "Rochester Hills", "Renter")
     Database.users[dummyRenterAccount.username] = dummyRenterAccount
 
+#List of dummy cars
     dummyCars = [
         ("Ford Bronco", "2022"), ("Ford Bronco", "2024"), ("Ford Mustang", "2025"), ("Ford F150", "2020"),
         ("Kia Soul ", "2019"), ("Honda Civic", "2010"), ("Honda Accord", "2018"), ("Subaru Forester", "2021"),
         ("Subaru WRX", "2017"), ("Jeep Wrangler", "2016"), ("Mazda 3", "2022"), ("Mazda CX5", "2020")
     ]
-
+#List of dummy owners
     dummyOwners = [
         "John James", "James Smith", "David Jones", "Albert Einstein", "Lionel Messi", "Cristiano Ronaldo",
         "Ryan Reynolds", "Tom Brady", "Cade Cunningham", " Lebron James", "Buzz Lightyear", "Christian Pulisic"
     ]
-
+#Creating dummy car owners
     Users = []
     for name in dummyOwners:
         user = User(
@@ -42,6 +44,7 @@ def SetDummyData():
         Users.append(user)
         Database.users[user.username] = user
 
+#Building five random cars per city with random price and mileage
     builder = CarBuilder()
     CarsList = []
     for city in dummyCities:
@@ -63,11 +66,13 @@ def SetDummyData():
             OwnersList[i].listed_cars.append(car)
             Database.cars.append(car)
 
+#randomly setting the availability of the cars we built
         for car in random.sample(CarsList, 3):
             car.is_available = True
 
     Database.save()
 
+#The main function for the app that the runnable main function uses
 class DriveShareApp:
     def __init__(self):
         #use dummyData if Database has nothing
@@ -75,6 +80,7 @@ class DriveShareApp:
             SetDummyData()
 
         self.TKSetUp()
+#Attempting to set the frames to mediator
         try:
             mediator = DriveShareMediator(self.root)
             mediator.addFrame("LoginFrame", LoginFrame(self.root, mediator))
@@ -82,16 +88,19 @@ class DriveShareApp:
             mediator.addFrame("DashboardFrame", DashboardFrame(self.root, mediator))
         except Exception:
             print("Something went wrong setting up Frames")
+#Calling the magnifier
         try:
             self.setMagnifier()
             mediator.on_frame_change = self.magnifier_frame.lift
         except Exception:
             print("Something went wrong setting up Magnifier")
+#Taking to LoginFrame as that is the first place the app should take you
         try:
             mediator.showFrame("LoginFrame")
         except Exception:
             print("Something went wrong showing frame")
 
+#Setting the magnifier for the zoom functionality
     def setMagnifier(self):
         self.magnifier_frame = tk.Frame(
             self.root,
@@ -106,7 +115,7 @@ class DriveShareApp:
             rely=0.98,
             anchor='sw'
         )
-
+#Setting the label for the zoom functionality
         ttk.Label(
             self.magnifier_frame,
             text="Zoom",
@@ -117,7 +126,7 @@ class DriveShareApp:
             padx=(5, 5),
             pady=(5, 5)
         )
-
+#setting the button for zoom in
         tk.Button(
             self.magnifier_frame,
             text="+",
@@ -131,7 +140,7 @@ class DriveShareApp:
             padx=(2, 10),
             pady=5
         )
-
+#Setting the button for zoom out
         tk.Button(
             self.magnifier_frame,
             text="-",
@@ -146,19 +155,21 @@ class DriveShareApp:
             pady=5
         )
 
+#Deciding the new zoomed in size
     def zoomIn(self):
         #go through each font and scale up
         currentSize = self.fonts["default"].cget("size")
         if currentSize <= self.base_size + 8:
             self.applyZoom(currentSize + 1)
 
+#Deciding the new zoomed out size
     def zoomOut(self):
         # go through each font and scale down
         currentSize = self.fonts["default"].cget("size")
         if currentSize >= max(8, self.base_size - 3):
             self.applyZoom(currentSize - 1)
 
-
+#Doing the action of zoom
     def applyZoom(self, new_size):
         for name, f in self.fonts.items():
             if name == "heading":
@@ -166,6 +177,7 @@ class DriveShareApp:
             else:
                 f.configure(size=new_size)
 
+#Setup for the TKinter
     def TKSetUp(self):
         self.root = tk.Tk()
         self.root.title("DriveShare - Peer-to-Peer Car Rental")
@@ -177,6 +189,7 @@ class DriveShareApp:
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
 
+        # Setting Fonts
         self.fonts = {
             "default": tkfont.nametofont("TkDefaultFont"),
             "text": tkfont.nametofont("TkTextFont"),
@@ -200,6 +213,7 @@ class DriveShareApp:
     def run(self):
         self.root.mainloop()
 
+#Runnable Main app function
 if __name__ == "__main__":
     app = DriveShareApp()
     app.run()
